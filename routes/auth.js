@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
   res.redirect("/dashboard");
 });
 
-// 🆕 Liste des utilisateurs (sécurisée)
+// Liste des utilisateurs (sécurisée)
 router.get("/users", async (req, res) => {
   if (!req.session.user) return res.redirect("/auth/login");
 
@@ -50,5 +50,26 @@ router.get("/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/auth/login"));
 });
 
+// 🔥 Supprimer UN utilisateur
+router.post('/users/delete/:id', async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.redirect('/auth/users');
+  } catch (err) {
+   console.error(err);
+   res.status(500).send('Erreur lors de la suppression');
+  }
+});
+
+// 🔥 Supprimer TOUS les utilisateurs
+router.post('/users/delete-all', async (_, res) => {
+  try {
+    await User.deleteMany({});
+    res.redirect('/auth/users');
+  } catch (err) {
+   console.error(err);
+   res.status(500).send('Erreur lors de la suppression totale');
+  }
+});
 
 module.exports = router;

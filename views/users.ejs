@@ -16,11 +16,7 @@
       <h2 class="text-primary fw-bold">👥 Liste des utilisateurs</h2>
 
       <!-- Supprimer tous les utilisateurs -->
-      <a href="/auth/users/delete-all"
-         class="btn btn-danger"
-         onclick="return confirm('⚠️ Cette action supprimera TOUS les utilisateurs. Continuer ?')">
-        🗑️ Supprimer tout
-      </a>
+     
     </div>
 
     <div class="table-responsive shadow-sm rounded">
@@ -50,11 +46,11 @@
               <td><%= user.email %></td>
               <td class="text-center">
                 <!-- Supprimer un utilisateur -->
-                <a href="/auth/users/delete/<%= user._id %>"
-                   class="btn btn-danger btn-sm"
-                   onclick="return confirm('Supprimer cet utilisateur ?')">
-                  🗑️
-                </a>
+                <form action="/auth/users/delete/<%= user._id %>" method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                  <button type="submit" class="btn btn-danger btn-sm">
+                    🗑️
+                  </button>
+                </form>
               </td>
             </tr>
           <% }) %>
