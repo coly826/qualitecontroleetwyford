@@ -4,12 +4,13 @@ const controleSchema = new mongoose.Schema({
   date: String,
   mois: String,
   groupe: String,
-  cartons: Number,
-  pieces: Number,
-  etiquettes: Number,
-  edge: Number,
-  surface: Number,
-  broken: Number,
+  k_option: String,   // 👈 AJOUT
+  cartons: String,
+  pieces: String,
+  etiquettes: String,
+  edge: String,
+  surface: String,
+  broken: String,
   user: String
 });
 
