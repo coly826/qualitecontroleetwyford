@@ -3,72 +3,99 @@ const router = express.Router();
 const Controle = require("../models/Controle");
 const User = require("../models/User");
 
-// Middleware pour protéger les routes
+// ===== Middleware =====
 function protect(req, res, next) {
-  if (!req.session.user) return res.redirect("/auth/login");
+  if (!req.session.user) {
+    return res.redirect("/auth/login");
+  }
   next();
 }
 
-// =================== DASHBOARD ===================
+// ===== DASHBOARD =====
 router.get("/dashboard", protect, async (req, res) => {
   try {
-    const data = await Controle.find({ user: req.session.user.email });
+    const data = await Controle
+      .find({ user: req.session.user.email })
+      .sort({ createdAt: -1 });
+
     res.render("dashboard", { data });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Erreur lors de l'affichage du dashboard");
+    res.status(500).send("Erreur dashboard");
   }
 });
 
-// =================== FORMULAIRE QC ===================
+// ===== FORMULAIRE =====
 router.get("/form", protect, (req, res) => {
   res.render("form");
 });
 
-// =================== ENREGISTRER FORMULAIRE ===================
+// ===== ENREGISTRER (TEXTE UNIQUEMENT) =====
 router.post("/form", protect, async (req, res) => {
   try {
-    await Controle.create({
-      ...req.body, // inclut k_option
-      user: req.session.user.email
+    const controle = new Controle({
+      date: String(req.body.date),
+      mois: String(req.body.mois),
+      groupe: String(req.body.groupe),
+      k_option: String(req.body.k_option),
+      ligne: String(req.body.ligne),
+
+      table_t1: String(req.body.table_t1),
+      table_t2: String(req.body.table_t2),
+      table_t3: String(req.body.table_t3),
+
+      cartons: String(req.body.cartons),
+      pieces: String(req.body.pieces),
+      etiquettes: String(req.body.etiquettes),
+      edge: String(req.body.edge),
+      surface: String(req.body.surface),
+      broken: String(req.body.broken),
+
+      user: String(req.session.user.email)
     });
+
+    await controle.save();
     res.redirect("/dashboard");
+
   } catch (err) {
     console.error(err);
-    res.status(500).send("Erreur lors de l'enregistrement du formulaire");
+    res.status(500).send("Erreur enregistrement");
   }
 });
 
-// =================== SUPPRIMER UNE LIGNE ===================
-router.post("/rapport/delete/:id", protect, async (req, res) => {
+// ===== SUPPRESSION =====
+router.post("/delete/:id", protect, async (req, res) => {
   try {
     await Controle.findByIdAndDelete(req.params.id);
-    res.redirect("/rapport"); // Retour sur la page rapport
+
+    // Retourner à la page précédente ou dashboard si pas possible
+    const prev = req.headers.referer || "/dashboard";
+    res.redirect(prev);
+    
   } catch (err) {
     console.error(err);
-    res.status(500).send("Erreur lors de la suppression");
+    res.status(500).send("Erreur suppression");
   }
 });
 
-// =================== RAPPORT GLOBAL ===================
+// ===== RAPPORT GLOBAL =====
 router.get("/rapport", protect, async (req, res) => {
   try {
-    const controles = await Controle.find();
+    const controles = await Controle.find().sort({ date: 1 });
     const users = await User.find({}, { email: 1, nom: 1 });
 
-    // Map email -> nom
-    const emailToNom = {};
-    users.forEach(u => { emailToNom[u.email] = u.nom; });
+    const mapNom = {};
+    users.forEach(u => mapNom[u.email] = u.nom);
 
     const data = controles.map(c => ({
       ...c._doc,
-      nom: emailToNom[c.user] || c.user
+      nom: mapNom[c.user] || c.user
     }));
 
     res.render("rapport", { data });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Erreur lors de l'affichage du rapport");
+    res.status(500).send("Erreur rapport");
   }
 });
 

@@ -4,23 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rapport Global QC</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-light">
+<body class="bg-light pt-5">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+<nav class="navbar navbar-dark bg-primary fixed-top">
   <div class="container-fluid">
     <span class="navbar-brand fw-bold">📊 RAPPORT GLOBAL QC</span>
-    <div class="ms-auto">
-      <a href="/dashboard" class="btn btn-light btn-sm">⬅ Dashboard</a>
-    </div>
+    <a href="/dashboard" class="btn btn-light btn-sm">⬅ Dashboard</a>
   </div>
 </nav>
 
-<div class="container-fluid mt-5 pt-4 px-3">
-
-<h4 class="text-primary mb-4">Historique des contrôles (Tous utilisateurs)</h4>
+<div class="container-fluid mt-4">
 
 <%
   const groupes = ["A","B","C"];
@@ -29,139 +26,119 @@
     "Juillet","Août","Septembre","Octobre","Novembre","Décembre"
   ];
   const kListe = ["K1A","K1B","K1C","K2A","K2B","K2C","K3A","K3B","K3C"];
+
   const num = v => isNaN(parseFloat(v)) ? 0 : parseFloat(v);
 %>
 
-<!-- ================== PAR GROUPE ================== -->
 <% groupes.forEach(groupe => { 
-     const lignesGroupe = data.filter(d => d.groupe === groupe); 
+   const dataGroupe = data.filter(d => d.groupe === groupe);
 %>
 
-<div class="p-3 rounded bg-white shadow-sm mb-4">
-  <h4 class="fw-bold text-secondary">🟦 GROUPE <%= groupe %></h4>
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-secondary text-white fw-bold">
+    GROUPE <%= groupe %>
+  </div>
 
-  <% if (!lignesGroupe.length) { %>
-    <p class="text-muted fst-italic">Aucune donnée enregistrée pour ce groupe.</p>
+  <div class="card-body">
+
+  <% if (!dataGroupe.length) { %>
+    <p class="text-muted fst-italic">Aucune donnée pour ce groupe.</p>
   <% } else { %>
 
-    <!-- ================== PAR K ================== -->
-    <% kListe.forEach(kOption => { 
-         const lignesK = lignesGroupe.filter(l => l.k_option === kOption);
-         if (!lignesK.length) return;  // si aucun contrôle pour ce K, skip
+  <% kListe.forEach(k => { 
+     const dataK = dataGroupe.filter(d => d.k_option === k);
+     if (!dataK.length) return;
+  %>
 
-         // Totaux pour ce K
-         const totalK = lignesK.reduce((t,i)=>{
-           t.cartons += num(i.cartons);
-           t.pieces += num(i.pieces);
-           t.etiquettes += num(i.etiquettes);
-           t.edge += num(i.edge);
-           t.surface += num(i.surface);
-           t.broken += num(i.broken);
-           return t;
-         }, {cartons:0,pieces:0,etiquettes:0,edge:0,surface:0,broken:0});
-    %>
+  <h5 class="text-primary mt-3">🔹 K : <%= k %></h5>
 
-    <div class="mt-3">
-      <h5 class="text-primary">🔹 <%= kOption %></h5>
+  <% moisListe.forEach(mois => {
+     const dataMois = dataK.filter(d => d.mois === mois);
+     if (!dataMois.length) return;
 
-      <% moisListe.forEach(mois => { 
-           const lignesMois = lignesK.filter(l => l.mois === mois);
-           if (!lignesMois.length) return;
+     const totalMois = dataMois.reduce((t,i)=>{
+       t.cartons += num(i.cartons);
+       t.pieces += num(i.pieces);
+       t.etiquettes += num(i.etiquettes);
+       t.edge += num(i.edge);
+       t.surface += num(i.surface);
+       t.broken += num(i.broken);
+       return t;
+     }, {cartons:0,pieces:0,etiquettes:0,edge:0,surface:0,broken:0});
+  %>
 
-           const totalMois = lignesMois.reduce((t,i)=>{
-             t.cartons += num(i.cartons);
-             t.pieces += num(i.pieces);
-             t.etiquettes += num(i.etiquettes);
-             t.edge += num(i.edge);
-             t.surface += num(i.surface);
-             t.broken += num(i.broken);
-             return t;
-           }, {cartons:0,pieces:0,etiquettes:0,edge:0,surface:0,broken:0});
-      %>
+  <h6 class="mt-3 text-secondary">📅 Mois : <%= mois %></h6>
 
-      <h6 class="mt-2 text-secondary">📅 <%= mois %></h6>
+  <div class="table-responsive">
+  <table class="table table-bordered table-striped align-middle text-center">
+    <thead class="table-primary">
+      <tr>
+        <th>Date</th>
+        <th>Ligne</th>
+        <th>T1</th>
+        <th>T2</th>
+        <th>T3</th>
+        <th>Nbre de Cartons Controlé</th>
+        <th>Pièces</th>
+        <th>Étiquettes</th>
+        <th>Edge</th>
+        <th>Surface</th>
+        <th>Broken</th>
+        <th>Action</th>
+      </tr>
+    </thead>
 
-      <div class="table-responsive">
-      <table class="table table-bordered table-striped text-center">
-        <thead class="table-secondary">
-          <tr>
-            <th>Date</th>
-            <th>Cartons</th>
-            <th>Pièces</th>
-            <th>Étiquettes</th>
-            <th>Edge</th>
-            <th>Surface</th>
-            <th>Broken</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% lignesMois.forEach(l => { %>
-          <tr>
-            <td><%= l.date %></td>
-            <td><%= l.cartons %></td>
-            <td><%= l.pieces %></td>
-            <td><%= l.etiquettes %></td>
-            <td><%= l.edge %></td>
-            <td><%= l.surface %></td>
-            <td><%= l.broken %></td>
-            <td>
-              <form action="/rapport/delete/<%= l._id %>" method="POST"
-                onsubmit="return confirm('Voulez-vous vraiment supprimer cette ligne ?');">
-                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-              </form>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-        <tfoot>
-          <tr class="table-success fw-bold">
-            <td>TOTAL</td>
-            <td><%= totalMois.cartons %></td>
-            <td><%= totalMois.pieces %></td>
-            <td><%= totalMois.etiquettes %></td>
-            <td><%= totalMois.edge %></td>
-            <td><%= totalMois.surface %></td>
-            <td><%= totalMois.broken %></td>
-            <td>-</td>
-          </tr>
-        </tfoot>
-      </table>
-      </div>
+    <tbody>
+    <% dataMois.forEach(l => { %>
+      <tr>
+        <td><%= l.date %></td>
+        <td><%= l.ligne %></td>
+        <td><%= l.table_t1 %></td>
+        <td><%= l.table_t2 %></td>
+        <td><%= l.table_t3 %></td>
+        <td><%= l.cartons %></td>
+        <td><%= l.pieces %></td>
+        <td><%= l.etiquettes %></td>
+        <td><%= l.edge %></td>
+        <td><%= l.surface %></td>
+        <td><%= l.broken %></td>
+        <td>
+          <form action="/delete/<%= l._id %>" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-danger btn-sm"
+              onclick="return confirm('Voulez-vous vraiment supprimer cette ligne ?');">
+              Supprimer
+            </button>
+          </form>
+          
+        </td>
+      </tr>
+    <% }) %>
+    </tbody>
 
-      <% }) %> <!-- fin mois -->
-    </div>
+    <tfoot>
+      <tr class="table-success fw-bold">
+        <td colspan="5">TOTAL DU MOIS</td>
+        <td><%= totalMois.cartons %></td>
+        <td><%= totalMois.pieces %></td>
+        <td><%= totalMois.etiquettes %></td>
+        <td><%= totalMois.edge %></td>
+        <td><%= totalMois.surface %></td>
+        <td><%= totalMois.broken %></td>
+        <td>-</td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
 
-    <!-- ====== Total par K ====== -->
-    <table class="table table-bordered table-success text-center mt-2">
-      <thead>
-        <tr>
-          <th>Total pour <%= kOption %></th>
-          <th>Cartons</th>
-          <th>Pièces</th>
-          <th>Étiquettes</th>
-          <th>Edge</th>
-          <th>Surface</th>
-          <th>Broken</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="fw-bold">
-          <td><%= kOption %></td>
-          <td><%= totalK.cartons %></td>
-          <td><%= totalK.pieces %></td>
-          <td><%= totalK.etiquettes %></td>
-          <td><%= totalK.edge %></td>
-          <td><%= totalK.surface %></td>
-          <td><%= totalK.broken %></td>
-        </tr>
-      </tbody>
-    </table>
+  <% }) %> <!-- fin mois -->
 
-    <% }) %> <!-- fin K -->
-  <% } %> <!-- fin else lignesGroupe -->
+  <% }) %> <!-- fin K -->
 
+  <% } %>
+
+  </div>
 </div>
+
 <% }) %> <!-- fin groupes -->
 
 </div>

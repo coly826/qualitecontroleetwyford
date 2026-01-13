@@ -2,85 +2,63 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Twyford - QC Dashboard</title>
-
-<!-- Bootstrap CSS -->
+<title>Dashboard QC</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-light">
+<body class="bg-light pt-5">
 
 <nav class="navbar navbar-dark bg-primary fixed-top">
   <div class="container">
-    <a class="navbar-brand">TWYFORD QC DASHBOARD</a>
-
-    <div class="d-flex gap-2">
-      <a href="/form" class="btn btn-primary mb-3">➕ Formulaire QC</a>
-      <a class="btn btn-success btn-sm" href="/rapport">📊 Rapport Global</a>
-      <a class="btn btn-warning btn-sm" href="/auth/users">👥 Utilisateurs</a>
-      <a class="btn btn-outline-light btn-sm" href="/auth/logout">Se déconnecter</a>
-    </div>
+    <span class="navbar-brand">QC DASHBOARD</span>
+    <a href="/form" class="btn btn-light btn-sm">➕ Ajouter</a>
+    <a href="/rapport" class="btn btn-success btn-sm">📊 Rapport</a>
   </div>
 </nav>
 
-<div class="container mt-5 pt-4">
-  <h3 class="text-primary mb-4">Dashboard - Historique des contrôles</h3>
+<div class="container mt-4">
 
-  <% 
-    const moisListe = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août",
-                       "Septembre","Octobre","Novembre","Décembre"]; 
-  %>
+<table class="table table-bordered table-striped text-center">
+<thead class="table-primary">
+<tr>
+<th>Date</th><th>Mois</th><th>Groupe</th><th>K</th>
+<th>Ligne</th><th>T1</th><th>T2</th><th>T3</th>
+<th>Nbre de Cartons Controlé</th><th>Pièces</th><th>Étiquettes</th>
+<th>Edge</th><th>Surface</th><th>Broken</th><th>Action</th>
+</tr>
+</thead>
 
-  <% moisListe.forEach(mois => { %>
-    <% let filtres = data.filter(d => d.mois === mois); %>
-    <% if(filtres.length > 0){ %>
+<tbody>
+<% data.forEach(d => { %>
+<tr>
+<td><%= d.date %></td>
+<td><%= d.mois %></td>
+<td><%= d.groupe %></td>
+<td><%= d.k_option %></td>
+<td><%= d.ligne %></td>
+<td><%= d.table_t1 %></td>
+<td><%= d.table_t2 %></td>
+<td><%= d.table_t3 %></td>
+<td><%= d.cartons %></td>
+<td><%= d.pieces %></td>
+<td><%= d.etiquettes %></td>
+<td><%= d.edge %></td>
+<td><%= d.surface %></td>
+<td><%= d.broken %></td>
+<td>
+  <form action="/delete/<%= d._id %>" method="POST" class="d-inline">
+    <button type="submit" class="btn btn-danger btn-sm"
+      onclick="return confirm('Supprimer cette ligne ?');">
+      Supprimer
+    </button>
+  </form>
+  
+</td>
+</tr>
+<% }) %>
+</tbody>
+</table>
 
-      <h5 class="mt-4 text-secondary border-bottom pb-1"><%= mois %></h5>
-
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped align-middle">
-          <thead class="table-primary">
-            <tr>
-              <th>Date</th>
-              <th>Groupe</th>
-              <th>K</th>
-              <th>Cartons</th>
-              <th>Pièces</th>
-              <th>Étiquettes</th>
-              <th>Edge</th>
-              <th>Surface</th>
-              <th>Broken</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% filtres.forEach(item => { %>
-            <tr>
-              <td><%= item.date %></td>
-              <td><%= item.groupe %></td>
-              <td><%= item.k_option %></td>
-              <td><%= item.cartons %></td>
-              <td><%= item.pieces %></td>
-              <td><%= item.etiquettes %></td>
-              <td><%= item.edge %></td>
-              <td><%= item.surface %></td>
-              <td><%= item.broken %></td>
-              <td>
-                <a class="btn btn-danger btn-sm" href="/delete/<%= item._id %>">Supprimer</a>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-
-    <% } %>
-  <% }) %>
 </div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
