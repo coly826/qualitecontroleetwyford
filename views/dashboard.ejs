@@ -2,63 +2,146 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard QC</title>
+
+<!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- AOS Animation -->
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<style>
+/* ====== TABLE RESPONSIVE ====== */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table th, table td {
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+/* ====== NAVBAR ====== */
+.navbar {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.navbar-brand {
+  font-weight: bold;
+}
+
+/* ====== BUTTONS ====== */
+.btn {
+  transition: all 0.3s ease-in-out;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+/* ====== TABLE ROW ANIMATION ====== */
+tbody tr {
+  transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #e9f2ff;
+  transform: scale(1.01);
+}
+
+/* ====== MOBILE ADJUST ====== */
+@media (max-width: 768px) {
+  table th, table td {
+    font-size: 12px;
+  }
+}
+</style>
 </head>
 
 <body class="bg-light pt-5">
 
-<nav class="navbar navbar-dark bg-primary fixed-top">
-  <div class="container">
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-dark bg-primary fixed-top" data-aos="fade-down">
+  <div class="container-fluid d-flex justify-content-between">
     <span class="navbar-brand">QC DASHBOARD</span>
-    <a href="/form" class="btn btn-light btn-sm">➕ Ajouter</a>
-    <a href="/rapport" class="btn btn-success btn-sm">📊 Rapport</a>
+
+    <div class="d-flex gap-2">
+      <a href="/form" class="btn btn-light ">➕ Ajouter</a>
+      <a href="/rapport" class="btn btn-success ">📊 Rapport</a>
+    </div>
   </div>
 </nav>
 
-<div class="container mt-4">
+<!-- ===== CONTENT ===== -->
+<div class="container-fluid mt-4">
 
-<table class="table table-bordered table-striped text-center">
-<thead class="table-primary">
-<tr>
-<th>Date</th><th>Mois</th><th>Groupe</th><th>K</th>
-<th>Ligne</th><th>T1</th><th>T2</th><th>T3</th>
-<th>Nbre de Cartons Controlé</th><th>Pièces</th><th>Étiquettes</th>
-<th>Edge</th><th>Surface</th><th>Broken</th><th>Action</th>
-</tr>
-</thead>
+  <!-- TABLE ANIMATION -->
+  <div class="table-responsive" data-aos="zoom-in" data-aos-duration="800">
+    <table class="table table-bordered table-striped table-hover text-center align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>Date</th>
+          <th>Mois</th>
+          <th>Groupe</th>
+          <th>K</th>
+          <th>Ligne</th>
+          <th>T1</th>
+          <th>T2</th>
+          <th>T3</th>
+          <th>Cartons</th>
+          <th>Pièces</th>
+          <th>Étiquettes</th>
+          <th>Edge</th>
+          <th>Surface</th>
+          <th>Broken</th>
+          <th>Action</th>
+        </tr>
+      </thead>
 
-<tbody>
-<% data.forEach(d => { %>
-<tr>
-<td><%= d.date %></td>
-<td><%= d.mois %></td>
-<td><%= d.groupe %></td>
-<td><%= d.k_option %></td>
-<td><%= d.ligne %></td>
-<td><%= d.table_t1 %></td>
-<td><%= d.table_t2 %></td>
-<td><%= d.table_t3 %></td>
-<td><%= d.cartons %></td>
-<td><%= d.pieces %></td>
-<td><%= d.etiquettes %></td>
-<td><%= d.edge %></td>
-<td><%= d.surface %></td>
-<td><%= d.broken %></td>
-<td>
-  <form action="/delete/<%= d._id %>" method="POST" class="d-inline">
-    <button type="submit" class="btn btn-danger btn-sm"
-      onclick="return confirm('Supprimer cette ligne ?');">
-      Supprimer
-    </button>
-  </form>
-  
-</td>
-</tr>
-<% }) %>
-</tbody>
-</table>
+      <tbody>
+        <% data.forEach(d => { %>
+        <tr data-aos="fade-up" data-aos-delay="100">
+          <td><%= d.date %></td>
+          <td><%= d.mois %></td>
+          <td><%= d.groupe %></td>
+          <td><%= d.k_option %></td>
+          <td><%= d.ligne %></td>
+          <td><%= d.table_t1 %></td>
+          <td><%= d.table_t2 %></td>
+          <td><%= d.table_t3 %></td>
+          <td><%= d.cartons %></td>
+          <td><%= d.pieces %></td>
+          <td><%= d.etiquettes %></td>
+          <td><%= d.edge %></td>
+          <td><%= d.surface %></td>
+          <td><%= d.broken %></td>
+          <td>
+            <form action="/delete/<%= d._id %>" method="POST">
+              <button type="submit" class="btn btn-danger btn-sm"
+                onclick="return confirm('Supprimer cette ligne ?');">
+                🗑 Supprimer
+              </button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
 
 </div>
+
+<!-- AOS JS -->
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({
+    once: true,
+    duration: 700,
+    easing: 'ease-in-out'
+  });
+</script>
+
 </body>
 </html>
