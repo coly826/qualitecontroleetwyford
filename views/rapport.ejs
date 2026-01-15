@@ -7,7 +7,48 @@
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
+<style>
+  /* ====== FORCE LES COULEURS A L'IMPRESSION ====== */
+  @media print {
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+  
+    body {
+      background: #ffffff !important;
+    }
+  
+    .navbar, .btn, form {
+      display: none !important; /* Cache les boutons et navbar si tu veux */
+    }
+  
+    .badge {
+      color: #fff !important;
+      border-radius: 4px !important;
+      padding: 4px 6px !important;
+    }
+  
+    /* Garder les tables en couleur */
+    .table-primary {
+      background-color: #cfe2ff !important;
+    }
+    .table-success {
+      background-color: #d1e7dd !important;
+    }
+    .bg-secondary {
+      background-color: #6c757d !important;
+      color: #fff !important;
+    }
+    .bg-primary {
+      background-color: #0d6efd !important;
+      color: #fff !important;
+    }
+  }
+  
+  </style>
+  
 <body class="bg-light pt-5">
 
 <nav class="navbar navbar-dark bg-primary fixed-top">
@@ -65,6 +106,16 @@
        t.broken += num(i.broken);
        return t;
      }, {cartons:0,pieces:0,etiquettes:0,edge:0,surface:0,broken:0});
+
+     const totalDefautsMois =
+       totalMois.pieces +
+       totalMois.etiquettes +
+       totalMois.edge +
+       totalMois.surface +
+       totalMois.broken;
+
+     const pourcentageMois =
+       totalMois.cartons > 0 ? (totalDefautsMois / totalMois.cartons) * 100 : 0;
   %>
 
   <h6 class="mt-3 text-secondary">📅 Mois : <%= mois %></h6>
@@ -78,38 +129,57 @@
         <th>T1</th>
         <th>T2</th>
         <th>T3</th>
-        <th>Nbre de Cartons Controlé</th>
-        <th>Pièces</th>
-        <th>Étiquettes</th>
+        <th><center>Nbre Cartons contrôlés</center></th>
+        <th><center>Pièces Manquants</center></th>
+        <th><center>Étiquettes Manquants</center></th>
         <th>Edge</th>
         <th>Surface</th>
         <th>Broken</th>
+        <th>% Défauts</th>
         <th>Action</th>
       </tr>
     </thead>
 
     <tbody>
-    <% dataMois.forEach(l => { %>
+    <% dataMois.forEach(l => { 
+       const cartons = num(l.cartons);
+       const defauts =
+         num(l.pieces) +
+         num(l.etiquettes) +
+         num(l.edge) +
+         num(l.surface) +
+         num(l.broken);
+
+       const pourcentage =
+         cartons > 0 ? (defauts / cartons) * 100 : 0;
+    %>
       <tr>
         <td><%= l.date %></td>
         <td><%= l.ligne %></td>
         <td><%= l.table_t1 %></td>
         <td><%= l.table_t2 %></td>
         <td><%= l.table_t3 %></td>
-        <td><%= l.cartons %></td>
+        <td><%= cartons %></td>
         <td><%= l.pieces %></td>
         <td><%= l.etiquettes %></td>
         <td><%= l.edge %></td>
         <td><%= l.surface %></td>
         <td><%= l.broken %></td>
+
         <td>
-          <form action="/delete/<%= l._id %>" method="POST" class="d-inline">
-            <button type="submit" class="btn btn-danger btn-sm"
-              onclick="return confirm('Voulez-vous vraiment supprimer cette ligne ?');">
-              Supprimer
+          <span class="badge 
+            <%= pourcentage < 2 ? 'bg-success' : pourcentage < 5 ? 'bg-warning' : 'bg-danger' %>">
+            <%= pourcentage.toFixed(2) %> %
+          </span>
+        </td>
+
+        <td>
+          <form action="/delete/<%= l._id %>" method="POST">
+            <button class="btn btn-danger btn-sm"
+              onclick="return confirm('Supprimer cette ligne ?');">
+              🗑
             </button>
           </form>
-          
         </td>
       </tr>
     <% }) %>
@@ -124,6 +194,12 @@
         <td><%= totalMois.edge %></td>
         <td><%= totalMois.surface %></td>
         <td><%= totalMois.broken %></td>
+
+        <td>
+          <span class="badge bg-dark">
+            <%= pourcentageMois.toFixed(2) %> %
+          </span>
+        </td>
         <td>-</td>
       </tr>
     </tfoot>
@@ -131,9 +207,7 @@
   </div>
 
   <% }) %> <!-- fin mois -->
-
   <% }) %> <!-- fin K -->
-
   <% } %>
 
   </div>

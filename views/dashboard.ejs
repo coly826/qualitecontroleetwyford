@@ -12,7 +12,6 @@
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
 <style>
-/* ====== TABLE RESPONSIVE ====== */
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -23,7 +22,6 @@ table th, table td {
   font-size: 14px;
 }
 
-/* ====== NAVBAR ====== */
 .navbar {
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
@@ -32,7 +30,6 @@ table th, table td {
   font-weight: bold;
 }
 
-/* ====== BUTTONS ====== */
 .btn {
   transition: all 0.3s ease-in-out;
 }
@@ -41,7 +38,6 @@ table th, table td {
   transform: scale(1.05);
 }
 
-/* ====== TABLE ROW ANIMATION ====== */
 tbody tr {
   transition: all 0.3s ease;
 }
@@ -51,12 +47,34 @@ tbody tr:hover {
   transform: scale(1.01);
 }
 
-/* ====== MOBILE ADJUST ====== */
 @media (max-width: 768px) {
   table th, table td {
     font-size: 12px;
   }
 }
+/* === FORCE LES COULEURS À L'IMPRESSION === */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  .navbar, .btn {
+    display: none !important; /* si tu ne veux pas imprimer les boutons */
+  }
+
+  .badge {
+    padding: 4px 6px !important;
+    border-radius: 4px !important;
+    font-weight: bold !important;
+  }
+}
+
 </style>
 </head>
 
@@ -66,19 +84,16 @@ tbody tr:hover {
 <nav class="navbar navbar-dark bg-primary fixed-top" data-aos="fade-down">
   <div class="container-fluid d-flex justify-content-between">
     <span class="navbar-brand">QC DASHBOARD</span>
-
     <div class="d-flex gap-2">
-      <a href="/form" class="btn btn-light ">➕ Ajouter</a>
-      <a href="/rapport" class="btn btn-success ">📊 Rapport</a>
+      <a href="/form" class="btn btn-light">➕ Ajouter</a>
+      <a href="/rapport" class="btn btn-success">📊 Rapport</a>
     </div>
   </div>
 </nav>
 
 <!-- ===== CONTENT ===== -->
 <div class="container-fluid mt-4">
-
-  <!-- TABLE ANIMATION -->
-  <div class="table-responsive" data-aos="zoom-in" data-aos-duration="800">
+  <div class="table-responsive" data-aos="zoom-in">
     <table class="table table-bordered table-striped table-hover text-center align-middle">
       <thead class="table-primary">
         <tr>
@@ -90,19 +105,31 @@ tbody tr:hover {
           <th>T1</th>
           <th>T2</th>
           <th>T3</th>
-          <th>Cartons</th>
-          <th>Pièces</th>
-          <th>Étiquettes</th>
+          <th>Nbre Cartons contrôlés</th>
+          <th>Pièces Manquants</th>
+          <th>Étiquettes Manquants</th>
           <th>Edge</th>
           <th>Surface</th>
           <th>Broken</th>
+          <th>% Défauts</th>
           <th>Action</th>
         </tr>
       </thead>
 
       <tbody>
-        <% data.forEach(d => { %>
-        <tr data-aos="fade-up" data-aos-delay="100">
+        <% data.forEach(d => { 
+          const cartons = Number(d.cartons) || 0;
+          const pieces = Number(d.pieces) || 0;
+          const etiquettes = Number(d.etiquettes) || 0;
+          const edge = Number(d.edge) || 0;
+          const surface = Number(d.surface) || 0;
+          const broken = Number(d.broken) || 0;
+
+          const totalDefauts = pieces + etiquettes + edge + surface + broken;
+          const pourcentage = cartons > 0 ? ((totalDefauts / cartons) * 100).toFixed(2) : "0.00";
+        %>
+
+        <tr data-aos="fade-up">
           <td><%= d.date %></td>
           <td><%= d.mois %></td>
           <td><%= d.groupe %></td>
@@ -111,17 +138,26 @@ tbody tr:hover {
           <td><%= d.table_t1 %></td>
           <td><%= d.table_t2 %></td>
           <td><%= d.table_t3 %></td>
-          <td><%= d.cartons %></td>
-          <td><%= d.pieces %></td>
-          <td><%= d.etiquettes %></td>
-          <td><%= d.edge %></td>
-          <td><%= d.surface %></td>
-          <td><%= d.broken %></td>
+          <td><%= cartons %></td>
+          <td><%= pieces %></td>
+          <td><%= etiquettes %></td>
+          <td><%= edge %></td>
+          <td><%= surface %></td>
+          <td><%= broken %></td>
+
+          <!-- POURCENTAGE -->
+          <td>
+            <span class="badge 
+              <%= pourcentage < 2 ? 'bg-success' : pourcentage < 5 ? 'bg-warning' : 'bg-danger' %>">
+              <%= pourcentage %> %
+            </span>
+          </td>
+
           <td>
             <form action="/delete/<%= d._id %>" method="POST">
               <button type="submit" class="btn btn-danger btn-sm"
                 onclick="return confirm('Supprimer cette ligne ?');">
-                🗑 Supprimer
+                🗑
               </button>
             </form>
           </td>
@@ -130,17 +166,16 @@ tbody tr:hover {
       </tbody>
     </table>
   </div>
-
 </div>
 
-<!-- AOS JS -->
+<!-- AOS -->
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
-  AOS.init({
-    once: true,
-    duration: 700,
-    easing: 'ease-in-out'
-  });
+AOS.init({
+  once: true,
+  duration: 700,
+  easing: 'ease-in-out'
+});
 </script>
 
 </body>
