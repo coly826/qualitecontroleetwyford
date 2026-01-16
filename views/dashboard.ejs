@@ -12,6 +12,7 @@
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
 <style>
+/* ===== TABLE RESPONSIVE ===== */
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -22,6 +23,7 @@ table th, table td {
   font-size: 14px;
 }
 
+/* ===== NAVBAR ===== */
 .navbar {
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
@@ -30,6 +32,7 @@ table th, table td {
   font-weight: bold;
 }
 
+/* ===== BUTTON ANIMATION ===== */
 .btn {
   transition: all 0.3s ease-in-out;
 }
@@ -38,6 +41,7 @@ table th, table td {
   transform: scale(1.05);
 }
 
+/* ===== ROW HOVER ===== */
 tbody tr {
   transition: all 0.3s ease;
 }
@@ -47,13 +51,14 @@ tbody tr:hover {
   transform: scale(1.01);
 }
 
-@media (max-width: 768px) {
+/* ===== MOBILE ADAPTATION ===== */
+@media (max-width: 992px) {
   table th, table td {
     font-size: 12px;
   }
 }
 
-/* === IMPRESSION === */
+/* ===== PRINT MODE ===== */
 @media print {
   * {
     -webkit-print-color-adjust: exact !important;
@@ -62,17 +67,32 @@ tbody tr:hover {
   }
 
   body {
-    background: white !important;
+    background: #ffffff !important;
   }
 
-  .navbar, .btn {
+  .navbar, .btn, form {
     display: none !important;
   }
 
   .badge {
-    padding: 4px 6px !important;
+    color: #fff !important;
     border-radius: 4px !important;
-    font-weight: bold !important;
+    padding: 4px 6px !important;
+  }
+
+  .table-primary {
+    background-color: #cfe2ff !important;
+  }
+  .table-success {
+    background-color: #d1e7dd !important;
+  }
+  .bg-secondary {
+    background-color: #6c757d !important;
+    color: #fff !important;
+  }
+  .bg-primary {
+    background-color: #0d6efd !important;
+    color: #fff !important;
   }
 }
 </style>
@@ -87,6 +107,7 @@ tbody tr:hover {
     <div class="d-flex gap-2">
       <a href="/form" class="btn btn-light">➕ Ajouter</a>
       <a href="/rapport" class="btn btn-success">📊 Rapport</a>
+      <button onclick="window.print()" class="btn btn-warning">🖨 Imprimer</button>
     </div>
   </div>
 </nav>
@@ -98,16 +119,15 @@ tbody tr:hover {
       <thead class="table-primary">
         <tr>
           <th>Date</th>
-          <th>Mois</th>
           <th>Groupe</th>
           <th>K</th>
           <th>Ligne</th>
           <th>T1</th>
           <th>T2</th>
           <th>T3</th>
-          <th>Nbre Cartons contrôlés</th>
-          <th>Pièces Manquantes</th>
-          <th>Étiquettes Manquantes</th>
+          <th>Cartons</th>
+          <th>Pièces</th>
+          <th>Étiquettes</th>
           <th>Edge</th>
           <th>Surface</th>
           <th>Broken</th>
@@ -131,7 +151,6 @@ tbody tr:hover {
 
         <tr data-aos="fade-up">
           <td><%= d.date %></td>
-          <td><%= d.mois %></td>
           <td><%= d.groupe %></td>
           <td><%= d.k_option %></td>
           <td><%= d.ligne %></td>
