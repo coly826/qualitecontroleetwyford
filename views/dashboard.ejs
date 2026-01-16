@@ -52,7 +52,8 @@ tbody tr:hover {
     font-size: 12px;
   }
 }
-/* === FORCE LES COULEURS À L'IMPRESSION === */
+
+/* === IMPRESSION === */
 @media print {
   * {
     -webkit-print-color-adjust: exact !important;
@@ -65,7 +66,7 @@ tbody tr:hover {
   }
 
   .navbar, .btn {
-    display: none !important; /* si tu ne veux pas imprimer les boutons */
+    display: none !important;
   }
 
   .badge {
@@ -74,7 +75,6 @@ tbody tr:hover {
     font-weight: bold !important;
   }
 }
-
 </style>
 </head>
 
@@ -106,8 +106,8 @@ tbody tr:hover {
           <th>T2</th>
           <th>T3</th>
           <th>Nbre Cartons contrôlés</th>
-          <th>Pièces Manquants</th>
-          <th>Étiquettes Manquants</th>
+          <th>Pièces Manquantes</th>
+          <th>Étiquettes Manquantes</th>
           <th>Edge</th>
           <th>Surface</th>
           <th>Broken</th>
@@ -126,7 +126,7 @@ tbody tr:hover {
           const broken = Number(d.broken) || 0;
 
           const totalDefauts = pieces + etiquettes + edge + surface + broken;
-          const pourcentage = cartons > 0 ? ((totalDefauts / cartons) * 100).toFixed(2) : "0.00";
+          const pourcentage = cartons > 0 ? (totalDefauts / cartons) * 100 : 0;
         %>
 
         <tr data-aos="fade-up">
@@ -147,9 +147,8 @@ tbody tr:hover {
 
           <!-- POURCENTAGE -->
           <td>
-            <span class="badge 
-              <%= pourcentage < 2 ? 'bg-success' : pourcentage < 5 ? 'bg-warning' : 'bg-danger' %>">
-              <%= pourcentage %> %
+            <span class="badge <%= pourcentage < 3 ? 'bg-success' : 'bg-danger' %>">
+              <%= pourcentage.toFixed(2) %> %
             </span>
           </td>
 
